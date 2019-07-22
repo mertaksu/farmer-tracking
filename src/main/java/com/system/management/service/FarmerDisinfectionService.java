@@ -65,4 +65,10 @@ public class FarmerDisinfectionService {
             return new ArrayList<>();
         }
     }
+    
+    public List<FarmerDisinfectionTransaction> getAllFarmerDisinfectionByUserId(Integer userId) {
+    	
+    	
+    	return farmerDisinfectionRepository.findByUserUserId(userId);
+    }
 }
