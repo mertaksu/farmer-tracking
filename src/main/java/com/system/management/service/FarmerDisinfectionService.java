@@ -67,8 +67,6 @@ public class FarmerDisinfectionService {
     }
     
     public List<FarmerDisinfectionTransaction> getAllFarmerDisinfectionByUserId(Integer userId) {
-    	
-    	
     	return farmerDisinfectionRepository.findByUserUserId(userId);
     }
 }

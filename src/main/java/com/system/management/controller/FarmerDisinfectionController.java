@@ -28,7 +28,7 @@ public class FarmerDisinfectionController {
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
     
-    @GetMapping(path = "/listdisinfection/{userId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/disinfection/{userId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<FarmerDisinfectionTransaction>> getAllFarmerDisinfectionsByUserId(@PathVariable("userId") Integer userId) {
         List<FarmerDisinfectionTransaction> responseList = farmerDisinfectionService.getAllFarmerDisinfectionByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
