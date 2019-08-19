@@ -1,5 +1,6 @@
 package com.system.management.service;
 
+import com.system.management.authentication.TokenAuthentication;
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.Land;
 import com.system.management.domain.entity.User;
@@ -10,6 +11,7 @@ import com.system.management.repository.LandRepository;
 import com.system.management.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 @Service
-public class UserService {
+public class UserService implements IUserService{
 
     UserRepository userRepository;
 
@@ -25,13 +27,15 @@ public class UserService {
 
     CropRepository cropRepository;
 
+    PasswordEncoder passEncoder;
+
     public int saveUser(UserRequest userRequest) {
         try {
             User user = new User();
             user.setUserName(userRequest.getUserName());
             user.setUserEmail(userRequest.getUserEmail());
             user.setUserGsm(userRequest.getUserGsm());
-            user.setUserPass(userRequest.getUserPass());
+            user.setUserPass(passEncoder.encode(userRequest.getUserPass()));
             User savedUser = userRepository.save(user);
 
             for (Land land:userRequest.getLandList()) {
@@ -94,5 +98,12 @@ public class UserService {
             log.error("Exception occured while getting user.",e);
             return false;
         }
+    }
+
+    public String getUserId(String userName) {
+        User user = userRepository.findByUserName(userName);
+        if(user!=null)
+            return String.valueOf(user.getUserId());
+        else return null;
     }
 }

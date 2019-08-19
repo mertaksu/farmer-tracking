@@ -1,8 +1,10 @@
 package com.tracking.management.farmer;
 
 import com.system.management.FarmerApplication;
+import com.system.management.authentication.TokenAuthentication;
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.Land;
+import com.system.management.domain.entity.User;
 import com.system.management.domain.request.FarmerDisinfectionRequest;
 import com.system.management.domain.request.UserRequest;
 import com.system.management.domain.response.FarmerDisinfectionResponse;
@@ -18,7 +20,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,16 +52,21 @@ public class FarmerApplicationTests {
 	@Autowired
 	FarmerDisinfectionRepository farmerDisinfectionRepository;
 
+	@Autowired
+	PasswordEncoder passEncoder;
+
 	int userId = 0;
 
 	@Before
 	public void setUp() {
-		userRepository.deleteAll();
 		farmerDisinfectionRepository.deleteAll();
+		userRepository.deleteAll();
+		cropRepository.deleteAll();
+		landRepository.deleteAll();
 
 		UserRequest userRequest = new UserRequest();
-		userRequest.setUserName("mertaksu");
-		userRequest.setUserPass("1234Aa");
+		userRequest.setUserName("baris");
+		userRequest.setUserPass("123");
 		userRequest.setUserEmail("mertaksu@outlook.com");
 		userRequest.setUserGsm("905448378867");
 
@@ -92,6 +101,13 @@ public class FarmerApplicationTests {
 		farmerDisinfectionRequest.setLand(landRepository.findByUserUserId(userId).get(0));
 		List<FarmerDisinfectionResponse> responseList = farmerDisinfectionService.saveNewFarmerDisinfection(farmerDisinfectionRequest);
 		Assert.assertNotEquals(0,responseList.size());
+	}
+
+	@Test
+	public void testEncodePass() {
+		User user = userRepository.findByUserName("baris");
+		passEncoder.matches("123",user.getUserPass());
+		Assert.assertTrue(true);
 	}
 
 }

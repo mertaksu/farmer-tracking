@@ -1,5 +1,6 @@
 package com.system.management.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -22,6 +23,7 @@ public class User {
     @Column(name = "USER_GSM")
     private String userGsm;
 
+    @JsonIgnore
     @Column(name = "USER_PASS")
     private String userPass;
 }

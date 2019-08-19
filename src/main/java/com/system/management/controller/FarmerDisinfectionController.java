@@ -3,7 +3,7 @@ package com.system.management.controller;
 import com.system.management.domain.entity.FarmerDisinfectionTransaction;
 import com.system.management.domain.request.FarmerDisinfectionRequest;
 import com.system.management.domain.response.FarmerDisinfectionResponse;
-import com.system.management.service.FarmerDisinfectionService;
+import com.system.management.service.IFarmerDisinfectionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 public class FarmerDisinfectionController {
 
-    FarmerDisinfectionService farmerDisinfectionService;
+    IFarmerDisinfectionService farmerDisinfectionService;
 
     @PostMapping(path = "/disinfection",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<FarmerDisinfectionResponse>> saveFarmerDisinfections(@RequestBody FarmerDisinfectionRequest farmerDisinfectionRequest) {

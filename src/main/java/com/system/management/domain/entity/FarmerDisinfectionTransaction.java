@@ -1,6 +1,10 @@
 package com.system.management.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -26,8 +30,10 @@ public class FarmerDisinfectionTransaction {
     @JoinColumn(name = "land_id")
     private Land land;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @NotFound(action= NotFoundAction.IGNORE)
     private User user;
 
     private Boolean status;

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FarmerDisinfectionService {
+public class FarmerDisinfectionService implements IFarmerDisinfectionService {
 
     FarmerDisinfectionRepository farmerDisinfectionRepository;
 
