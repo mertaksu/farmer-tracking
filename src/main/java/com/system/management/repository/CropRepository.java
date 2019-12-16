@@ -10,4 +10,5 @@ import java.util.List;
 public interface CropRepository extends CrudRepository<Crop,Integer> {
     List<Crop> findByUserUserId(Integer userId);
     void deleteByUserUserId(Integer userId);
+    void deleteById(Integer cropId);
 }

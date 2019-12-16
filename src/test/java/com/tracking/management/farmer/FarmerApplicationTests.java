@@ -2,45 +2,35 @@ package com.tracking.management.farmer;
 
 import com.system.management.FarmerApplication;
 import com.system.management.domain.entity.Crop;
+import com.system.management.domain.entity.FarmerDisinfectionTransaction;
 import com.system.management.domain.entity.Land;
 import com.system.management.domain.request.FarmerDisinfectionRequest;
 import com.system.management.domain.request.UserRequest;
 import com.system.management.domain.response.FarmerDisinfectionResponse;
-import com.system.management.repository.CropRepository;
+import com.system.management.domain.response.UserResponse;
 import com.system.management.repository.FarmerDisinfectionRepository;
-import com.system.management.repository.LandRepository;
 import com.system.management.repository.UserRepository;
-import com.system.management.service.FarmerDisinfectionService;
-import com.system.management.service.UserService;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.system.management.service.*;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = FarmerApplication.class)
 public class FarmerApplicationTests {
 
 	@Autowired
-	FarmerDisinfectionService farmerDisinfectionService;
+	IFarmerDisinfectionService farmerDisinfectionService;
 
 	FarmerDisinfectionRequest farmerDisinfectionRequest;
 
 	@Autowired
-	UserService userService;
-
-	@Autowired
-	LandRepository landRepository;
-
-	@Autowired
-	CropRepository cropRepository;
+	IUserService userService;
 
 	@Autowired
 	UserRepository userRepository;
@@ -48,9 +38,15 @@ public class FarmerApplicationTests {
 	@Autowired
 	FarmerDisinfectionRepository farmerDisinfectionRepository;
 
+	@Autowired
+	ILandService landService;
+
+	@Autowired
+	ICropService cropService;
+
 	int userId = 0;
 
-	@Before
+	@BeforeAll
 	public void setUp() {
 		userRepository.deleteAll();
 		farmerDisinfectionRepository.deleteAll();
@@ -68,16 +64,72 @@ public class FarmerApplicationTests {
 		userRequest.setCropList(cropList);
 
 		List<Land> landList = new ArrayList<>();
-		landList.add(new Land("Iznik"));
-		landList.add(new Land("Yenisehir"));
+		landList.add(new Land("Çakırca"));
+		landList.add(new Land("Boyalıca"));
 		userRequest.setLandList(landList);
 
 		userId = userService.saveUser(userRequest);
 
 	}
 
+	@Order(1)
 	@Test
-	public void saveNewDisinfection() {
+	public void deleteLand() {
+		List<Land> landList = landService.getLandsOfUser(userId);
+		int initSize = landList.size();
+		landService.deleteLand(landList.get(0).getId());
+		landList = landService.getLandsOfUser(userId);
+		int updatedSize = landList.size();
+		Assertions.assertEquals(updatedSize,initSize-1);
+	}
+
+	@Order(2)
+	@Test
+	public void addLand() {
+		List<Land> landList = landService.getLandsOfUser(userId);
+		int initSize = landList.size();
+		landService.addLand(userId,"testLand");
+		landList = landService.getLandsOfUser(userId);
+		int updatedSize = landList.size();
+		Assertions.assertEquals(updatedSize,initSize+1);
+	}
+
+	@Order(3)
+	@Test
+	public void deleteCrop() {
+		List<Crop> cropList = cropService.getCropsOfUser(userId);
+		int initSize = cropList.size();
+		cropService.deleteCrop(cropList.get(0).getId());
+		cropList = cropService.getCropsOfUser(userId);
+		int updatedSize = cropList.size();
+		Assertions.assertEquals(updatedSize,initSize-1);
+	}
+
+	@Order(4)
+	@Test
+	public void addCrop() {
+		List<Crop> cropList = cropService.getCropsOfUser(userId);
+		int initSize = cropList.size();
+		cropService.addCrop(userId,"testCrop");
+		cropList = cropService.getCropsOfUser(userId);
+		int updatedSize = cropList.size();
+		Assertions.assertEquals(updatedSize,initSize+1);
+	}
+
+	@Order(5)
+	@Test
+	public void deleteDisinfection() {
+		addDisinfection();
+		List<FarmerDisinfectionTransaction> farmerDisinfectionTransactionList = farmerDisinfectionService.getFarmerDisinfectionTransactionsByUserId(userId);
+		int initSize = farmerDisinfectionTransactionList.size();
+		farmerDisinfectionService.deleteDisinfectionTransactionById(farmerDisinfectionTransactionList.get(0).getId());
+		int updatedSize = farmerDisinfectionService.getFarmerDisinfectionTransactionsByUserId(userId).size();
+		Assertions.assertEquals(updatedSize,initSize-1);
+	}
+
+	@Order(6)
+	@Test
+	public void addDisinfection() {
 		farmerDisinfectionRequest = new FarmerDisinfectionRequest();
 		farmerDisinfectionRequest.setUserId(userId);
 		farmerDisinfectionRequest.setStatus(false);
@@ -88,10 +140,23 @@ public class FarmerApplicationTests {
 		calendar.set(2019,Calendar.AUGUST,30);
 		farmerDisinfectionRequest.setPharmacyFinishDate(calendar.getTime());
 		farmerDisinfectionRequest.setEveryFewDays(10);
-		farmerDisinfectionRequest.setCrop(cropRepository.findByUserUserId(userId).get(0));
-		farmerDisinfectionRequest.setLand(landRepository.findByUserUserId(userId).get(0));
+		farmerDisinfectionRequest.setCrop(cropService.getCropsOfUser(userId).get(0));
+		farmerDisinfectionRequest.setLand(landService.getLandsOfUser(userId).get(0));
 		List<FarmerDisinfectionResponse> responseList = farmerDisinfectionService.saveNewFarmerDisinfection(farmerDisinfectionRequest);
-		Assert.assertNotEquals(0,responseList.size());
+		Assertions.assertNotEquals(0,responseList.size());
 	}
 
+	@Order(7)
+	@Test
+	public void deleteUser() {
+		UserResponse userResponse = userService.getUser(userId);
+		Assertions.assertNotNull(userResponse);
+		userService.deleteUserById(userId);
+		userResponse = userService.getUser(userId);
+		Assertions.assertNull(userResponse);
+		List<Land> landList = landService.getLandsOfUser(userId);
+		List<Crop> cropList = cropService.getCropsOfUser(userId);
+		Assertions.assertEquals(0,landList.size());
+		Assertions.assertEquals(0,cropList.size());
+	}
 }

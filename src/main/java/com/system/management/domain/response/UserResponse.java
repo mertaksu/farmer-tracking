@@ -2,15 +2,14 @@ package com.system.management.domain.response;
 
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.Land;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class UserResponse {
     private String userName;
 

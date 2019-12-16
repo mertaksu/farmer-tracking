@@ -22,7 +22,5 @@ public class Land {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Land(String landName) {
-        this.landName = landName;
-    }
+    public Land(String name) {this.landName=name;}
 }

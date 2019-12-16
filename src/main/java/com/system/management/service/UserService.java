@@ -12,12 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
 @AllArgsConstructor
 @Service
-public class UserService {
+public class UserService implements IUserService{
 
     UserRepository userRepository;
 
@@ -32,6 +33,8 @@ public class UserService {
             user.setUserEmail(userRequest.getUserEmail());
             user.setUserGsm(userRequest.getUserGsm());
             user.setUserPass(userRequest.getUserPass());
+            user.setCropList(userRequest.getCropList());
+            user.setLandList(userRequest.getLandList());
             User savedUser = userRepository.save(user);
 
             for (Land land:userRequest.getLandList()) {
@@ -55,21 +58,25 @@ public class UserService {
         try {
             UserResponse userResponse = new UserResponse();
             User user = userRepository.findByUserId(userId);
-            List<Land> landList = landRepository.findByUserUserId(userId);
-            List<Crop> cropList = cropRepository.findByUserUserId(userId);
-            userResponse.setUserName(user.getUserName());
-            userResponse.setUserEmail(user.getUserEmail());
-            userResponse.setUserGsm(user.getUserGsm());
-            userResponse.setCropList(cropList);
-            userResponse.setLandList(landList);
-            return userResponse;
+            if(user!=null) {
+                List<Land> landList = landRepository.findByUserUserId(userId);
+                List<Crop> cropList = cropRepository.findByUserUserId(userId);
+                userResponse.setUserName(user.getUserName());
+                userResponse.setUserEmail(user.getUserEmail());
+                userResponse.setUserGsm(user.getUserGsm());
+                userResponse.setCropList(cropList);
+                userResponse.setLandList(landList);
+                return userResponse;
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             log.error("Exception occured while getting user.",e);
             return null;
         }
     }
 
-    public Boolean updateUser(Integer userId,UserRequest userRequest) {
+    public boolean updateUser(Integer userId,UserRequest userRequest) {
         try {
             User user = userRepository.findByUserId(userId);
             user.setUserGsm(userRequest.getUserGsm());
@@ -95,4 +102,11 @@ public class UserService {
             return false;
         }
     }
+
+    @Transactional
+    @Override
+    public void deleteUserById(Integer userId) {
+        userRepository.deleteByUserId(userId);
+    }
+
 }

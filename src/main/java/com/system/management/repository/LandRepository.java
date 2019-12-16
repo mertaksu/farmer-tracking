@@ -10,4 +10,5 @@ import java.util.List;
 public interface LandRepository extends CrudRepository<Land,Integer> {
     List<Land> findByUserUserId(Integer userId);
     void deleteByUserUserId(Integer userId);
+    void deleteById(Integer landId);
 }

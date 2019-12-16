@@ -19,12 +19,13 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FarmerDisinfectionService {
+public class FarmerDisinfectionService implements IFarmerDisinfectionService{
 
     FarmerDisinfectionRepository farmerDisinfectionRepository;
 
     UserRepository userRepository;
 
+    @Override
     public List<FarmerDisinfectionResponse> saveNewFarmerDisinfection(FarmerDisinfectionRequest farmerDisinfectionRequest) {
         try {
             List<FarmerDisinfectionTransaction> listOfFarmerTransactions = new ArrayList<>();
@@ -64,5 +65,15 @@ public class FarmerDisinfectionService {
             log.error("Exception occured while disinfection record persisting to table.",e);
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public List<FarmerDisinfectionTransaction> getFarmerDisinfectionTransactionsByUserId(Integer userId) {
+        return farmerDisinfectionRepository.findByUserUserId(userId);
+    }
+
+    @Override
+    public void deleteDisinfectionTransactionById(Integer id) {
+        farmerDisinfectionRepository.deleteById(id);
     }
 }

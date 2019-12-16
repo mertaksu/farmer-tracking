@@ -3,10 +3,11 @@ package com.system.management.domain.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "USER")
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -24,4 +25,11 @@ public class User {
 
     @Column(name = "USER_PASS")
     private String userPass;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Land> landList;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private List<Crop> cropList;
+
 }

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface FarmerDisinfectionRepository extends CrudRepository<FarmerDisinfectionTransaction,Integer> {
     List<FarmerDisinfectionTransaction> findByUserUserId(Integer userId);
+    void deleteById(Integer disinfectionId);
 }
