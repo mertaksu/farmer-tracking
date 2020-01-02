@@ -4,9 +4,11 @@ import com.system.management.domain.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends CrudRepository<User,Integer> {
     User findByUserId(Integer userId);
-    User findByUserNameAndUserPass(String userName,String pass);
+    List<User> findByUserNameAndUserPass(String userName, String pass);
     void deleteByUserId(Integer userId);
 }

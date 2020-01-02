@@ -6,6 +6,7 @@ import com.system.management.domain.entity.User;
 import com.system.management.domain.request.UserRequest;
 import com.system.management.domain.response.UserResponse;
 import com.system.management.repository.CropRepository;
+import com.system.management.repository.FarmerDisinfectionRepository;
 import com.system.management.repository.LandRepository;
 import com.system.management.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,8 @@ public class UserService implements IUserService{
     LandRepository landRepository;
 
     CropRepository cropRepository;
+
+    FarmerDisinfectionRepository farmerDisinfectionRepository;
 
     public int saveUser(UserRequest userRequest) {
         try {
@@ -76,12 +79,14 @@ public class UserService implements IUserService{
         }
     }
 
+    @Transactional
     public boolean updateUser(Integer userId,UserRequest userRequest) {
         try {
             User user = userRepository.findByUserId(userId);
             user.setUserGsm(userRequest.getUserGsm());
             user.setUserEmail(userRequest.getUserEmail());
-
+            user.setUserName(userRequest.getUserName());
+            user.setUserPass(userRequest.getUserPass());
             landRepository.deleteByUserUserId(userId);
             cropRepository.deleteByUserUserId(userId);
 
@@ -106,6 +111,7 @@ public class UserService implements IUserService{
     @Transactional
     @Override
     public void deleteUserById(Integer userId) {
+        farmerDisinfectionRepository.deleteByUserUserId(userId);
         userRepository.deleteByUserId(userId);
     }
 

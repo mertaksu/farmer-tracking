@@ -1,10 +1,15 @@
 package com.system.management.domain.entity;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "FARMER_DISINFECTION_TRANSACTION")
 public class FarmerDisinfectionTransaction {

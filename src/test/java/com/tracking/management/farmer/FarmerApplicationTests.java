@@ -4,24 +4,33 @@ import com.system.management.FarmerApplication;
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.FarmerDisinfectionTransaction;
 import com.system.management.domain.entity.Land;
+import com.system.management.domain.request.CropRequest;
 import com.system.management.domain.request.FarmerDisinfectionRequest;
+import com.system.management.domain.request.LandRequest;
 import com.system.management.domain.request.UserRequest;
+import com.system.management.domain.response.CropResponse;
 import com.system.management.domain.response.FarmerDisinfectionResponse;
 import com.system.management.domain.response.UserResponse;
 import com.system.management.repository.FarmerDisinfectionRepository;
 import com.system.management.repository.UserRepository;
 import com.system.management.service.*;
-import org.junit.jupiter.api.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringBootTest(classes = FarmerApplication.class)
+@RunWith(SpringRunner.class)
 public class FarmerApplicationTests {
 
 	@Autowired
@@ -46,10 +55,10 @@ public class FarmerApplicationTests {
 
 	int userId = 0;
 
-	@BeforeAll
+	@Before
 	public void setUp() {
-		userRepository.deleteAll();
 		farmerDisinfectionRepository.deleteAll();
+		userRepository.deleteAll();
 
 		UserRequest userRequest = new UserRequest();
 		userRequest.setUserName("mertaksu");
@@ -72,64 +81,55 @@ public class FarmerApplicationTests {
 
 	}
 
-	@Order(1)
 	@Test
-	public void deleteLand() {
+	public void a_addLand() {
+		List<Land> landList = landService.getLandsOfUser(userId);
+		int initSize = landList.size();
+		LandRequest landRequest = new LandRequest("testLand",userId);
+		landService.addLand(landRequest);
+		landList = landService.getLandsOfUser(userId);
+		int updatedSize = landList.size();
+		Assert.assertEquals(updatedSize,initSize+1);
+	}
+
+	@Test
+	public void b_deleteLand() {
 		List<Land> landList = landService.getLandsOfUser(userId);
 		int initSize = landList.size();
 		landService.deleteLand(landList.get(0).getId());
 		landList = landService.getLandsOfUser(userId);
 		int updatedSize = landList.size();
-		Assertions.assertEquals(updatedSize,initSize-1);
+		Assert.assertEquals(updatedSize,initSize-1);
 	}
 
-	@Order(2)
 	@Test
-	public void addLand() {
-		List<Land> landList = landService.getLandsOfUser(userId);
-		int initSize = landList.size();
-		landService.addLand(userId,"testLand");
-		landList = landService.getLandsOfUser(userId);
-		int updatedSize = landList.size();
-		Assertions.assertEquals(updatedSize,initSize+1);
+	public void c_addCrop() {
+		List<Crop> cropList = cropService.getCropsOfUser(userId);
+		int initSize = cropList.size();
+		CropRequest cropRequest = new CropRequest();
+		cropRequest.setCropName("testCrop");
+		cropRequest.setUserId(userId);
+		CropResponse cropResponse = cropService.addCrop(cropRequest);
+		cropList = cropService.getCropsOfUser(userId);
+		int updatedSize = cropList.size();
+		Assert.assertEquals(updatedSize,initSize+1);
+		Assert.assertNotNull(cropResponse);
+		Assert.assertNotNull(cropResponse.getId());
 	}
 
-	@Order(3)
+
 	@Test
-	public void deleteCrop() {
+	public void d_deleteCrop() {
 		List<Crop> cropList = cropService.getCropsOfUser(userId);
 		int initSize = cropList.size();
 		cropService.deleteCrop(cropList.get(0).getId());
 		cropList = cropService.getCropsOfUser(userId);
 		int updatedSize = cropList.size();
-		Assertions.assertEquals(updatedSize,initSize-1);
+		Assert.assertEquals(updatedSize,initSize-1);
 	}
 
-	@Order(4)
 	@Test
-	public void addCrop() {
-		List<Crop> cropList = cropService.getCropsOfUser(userId);
-		int initSize = cropList.size();
-		cropService.addCrop(userId,"testCrop");
-		cropList = cropService.getCropsOfUser(userId);
-		int updatedSize = cropList.size();
-		Assertions.assertEquals(updatedSize,initSize+1);
-	}
-
-	@Order(5)
-	@Test
-	public void deleteDisinfection() {
-		addDisinfection();
-		List<FarmerDisinfectionTransaction> farmerDisinfectionTransactionList = farmerDisinfectionService.getFarmerDisinfectionTransactionsByUserId(userId);
-		int initSize = farmerDisinfectionTransactionList.size();
-		farmerDisinfectionService.deleteDisinfectionTransactionById(farmerDisinfectionTransactionList.get(0).getId());
-		int updatedSize = farmerDisinfectionService.getFarmerDisinfectionTransactionsByUserId(userId).size();
-		Assertions.assertEquals(updatedSize,initSize-1);
-	}
-
-	@Order(6)
-	@Test
-	public void addDisinfection() {
+	public void e_addDisinfection() {
 		farmerDisinfectionRequest = new FarmerDisinfectionRequest();
 		farmerDisinfectionRequest.setUserId(userId);
 		farmerDisinfectionRequest.setStatus(false);
@@ -143,20 +143,28 @@ public class FarmerApplicationTests {
 		farmerDisinfectionRequest.setCrop(cropService.getCropsOfUser(userId).get(0));
 		farmerDisinfectionRequest.setLand(landService.getLandsOfUser(userId).get(0));
 		List<FarmerDisinfectionResponse> responseList = farmerDisinfectionService.saveNewFarmerDisinfection(farmerDisinfectionRequest);
-		Assertions.assertNotEquals(0,responseList.size());
+		Assert.assertNotEquals(0,responseList.size());
 	}
 
-	@Order(7)
 	@Test
-	public void deleteUser() {
+	public void f_deleteDisinfection() {
+		farmerDisinfectionRepository.deleteAll();
+		List<FarmerDisinfectionTransaction> farmerDisinfectionTransactionList = farmerDisinfectionRepository.findByUserUserId(userId);
+		Assert.assertEquals(0,farmerDisinfectionTransactionList.size());
+	}
+
+
+	@Test
+	public void g_deleteUser() {
 		UserResponse userResponse = userService.getUser(userId);
-		Assertions.assertNotNull(userResponse);
+		Assert.assertNotNull(userResponse);
 		userService.deleteUserById(userId);
 		userResponse = userService.getUser(userId);
-		Assertions.assertNull(userResponse);
+		Assert.assertNull(userResponse);
 		List<Land> landList = landService.getLandsOfUser(userId);
 		List<Crop> cropList = cropService.getCropsOfUser(userId);
-		Assertions.assertEquals(0,landList.size());
-		Assertions.assertEquals(0,cropList.size());
+		Assert.assertEquals(0,landList.size());
+		Assert.assertEquals(0,cropList.size());
 	}
+
 }

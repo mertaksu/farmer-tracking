@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,6 +73,7 @@ public class FarmerDisinfectionService implements IFarmerDisinfectionService{
         return farmerDisinfectionRepository.findByUserUserId(userId);
     }
 
+    @Transactional
     @Override
     public void deleteDisinfectionTransactionById(Integer id) {
         farmerDisinfectionRepository.deleteById(id);
