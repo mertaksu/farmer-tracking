@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,13 +20,13 @@ public class CropController {
     private final ICropService cropService;
 
     @PostMapping(path = "/crop",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CropResponse> saveNewCrop(@RequestBody CropRequest cropRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(cropService.addCrop(cropRequest));
+    public ResponseEntity<CropResponse> saveNewCrop(HttpServletRequest request,@RequestBody CropRequest cropRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(cropService.addCrop(cropRequest,Integer.parseInt((String)request.getAttribute("userId"))));
     }
 
-    @GetMapping(path = "/crop/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Crop>> getUsersCrop(@PathVariable Integer userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(cropService.getCropsOfUser(userId));
+    @GetMapping(path = "/crop", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Crop>> getUsersCrop(HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(cropService.getCropsOfUser(Integer.parseInt((String) request.getAttribute("userId"))));
     }
 
     @DeleteMapping(path = "/crop/{cropId}")

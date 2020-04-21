@@ -30,14 +30,12 @@ public class TokenAuthentication implements AuthenticationProvider{
 	  //TODO
 	  //Encrypt pass to brcypt hash
 	  UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new	UsernamePasswordAuthenticationToken(userName,password,authList);
-	  usernamePasswordAuthenticationToken.setAuthenticated(false);
 	  List<User> user = userRepository.findByUserNameAndUserPass(userName, password);
 	  if(user!=null && user.size()>0) {
-	  	usernamePasswordAuthenticationToken.setAuthenticated(true);
+		return new UsernamePasswordAuthenticationToken(userName,password,authList);
 	  } else {
-		usernamePasswordAuthenticationToken.setAuthenticated(false);
+	  	return null;
 	  }
-	  return usernamePasswordAuthenticationToken;
 	}
 
 	@Override

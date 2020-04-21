@@ -4,7 +4,7 @@ import com.system.management.domain.entity.Land;
 import com.system.management.domain.entity.User;
 import com.system.management.domain.request.LandRequest;
 import com.system.management.domain.response.LandResponse;
-import com.system.management.repository.FarmerDisinfectionRepository;
+import com.system.management.repository.FarmerPlanRepository;
 import com.system.management.repository.LandRepository;
 import com.system.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +22,16 @@ public class LandService implements ILandService {
 
     private final LandRepository landRepository;
 
-    private final FarmerDisinfectionRepository farmerDisinfectionRepository;
+    private final FarmerPlanRepository farmerPlanRepository;
 
     @Override
-    public LandResponse addLand(LandRequest landRequest) {
+    public LandResponse addLand(LandRequest landRequest,int userId) {
         Land land = new Land();
-        User user = userRepository.findByUserId(landRequest.getUserId());
+        User user = userRepository.findByUserId(userId);
         land.setUser(user);
         land.setLandName(landRequest.getLandName());
+        land.setLatitude(landRequest.getLatitude());
+        land.setLongitude(landRequest.getLongitude());
 
         Land savedLand = landRepository.save(land);
         LandResponse landResponse = new LandResponse();
@@ -43,8 +45,8 @@ public class LandService implements ILandService {
     @Override
     public boolean deleteLand(Integer landId) {
         try {
+            farmerPlanRepository.deleteByLandId(landId);
             landRepository.deleteById(landId);
-            farmerDisinfectionRepository.deleteByLandId(landId);
             return true;
         } catch (Exception e) {
             return false;

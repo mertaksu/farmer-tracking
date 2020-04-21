@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @Data
 public class CropRequest {
     private String cropName;
-    private Integer userId;
 }

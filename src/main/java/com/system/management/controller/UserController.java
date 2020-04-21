@@ -1,6 +1,7 @@
 package com.system.management.controller;
 
-import com.system.management.domain.request.UserRequest;
+import com.system.management.authentication.TokenAuthentication;
+import com.system.management.domain.request.RegisterRequest;
 import com.system.management.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +17,13 @@ public class UserController {
 
     UserService userService;
 
-    @PostMapping(path = "/user",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Integer> saveUser(@RequestBody UserRequest userRequest) {
-        int userId = userService.saveUser(userRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(userId);
-    }
+    TokenAuthentication tokenAuthentication;
 
-    @PutMapping(path = "/user/{userId}",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> updateUser(@PathVariable("userId") Integer userId,@RequestBody UserRequest userRequest) {
-        Boolean response = userService.updateUser(userId,userRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PostMapping(path = "/user",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> saveUser(@RequestBody RegisterRequest registerRequest) {
+        int userId = userService.saveUser(registerRequest);
+        if(userId==-1) return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
+        return ResponseEntity.status(HttpStatus.OK).body("SUCCESS");
     }
 
     @DeleteMapping(path = "/user/{userId}",consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -38,4 +36,23 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    /*
+    @PostMapping(path = "/auth/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public LoginResponse login(HttpServletResponse response, @RequestBody LoginRequest loginRequest) throws AuthenticationException {
+        log.info("Login request received for username:{}",loginRequest.getUsername());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword());
+        Authentication auth = tokenAuthentication.authenticate(authentication);
+        if(auth!=null) {
+            log.info("Login request succeed for username:{}",loginRequest.getUsername());
+            response.addHeader("x-auth",new String(Base64.getEncoder().encode((loginRequest.getUsername()+":"+loginRequest.getPassword()).getBytes())));
+            return new LoginResponse(200,new String(Base64.getEncoder().encode((loginRequest.getUsername()+":"+loginRequest.getPassword()).getBytes())));
+        }
+        else {
+            log.warn("Invalid username or password");
+            throw new BadCredentialsException("Invalid username or password");
+        }
+    }
+     */
+
 }

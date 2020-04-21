@@ -7,7 +7,7 @@ import com.system.management.domain.response.LandResponse;
 import java.util.List;
 
 public interface ILandService {
-    LandResponse addLand(LandRequest landRequest);
+    LandResponse addLand(LandRequest landRequest,int userId);
     boolean deleteLand(Integer landId);
     List<Land> getLandsOfUser(Integer userId);
     boolean updateLandName(Integer landId,String landName);

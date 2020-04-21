@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRequest {
+public class RegisterRequest {
     private String userName;
 
     private String userEmail;
@@ -19,8 +19,4 @@ public class UserRequest {
     private String userGsm;
 
     private String userPass;
-
-    private List<Land> landList;
-
-    private List<Crop> cropList;
 }

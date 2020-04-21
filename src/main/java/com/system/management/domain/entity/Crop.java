@@ -20,6 +20,7 @@ public class Crop {
     @Column(name = "CROP_NAME")
     private String cropName;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

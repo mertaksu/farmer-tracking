@@ -3,14 +3,15 @@ package com.system.management.service;
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.Land;
 import com.system.management.domain.entity.User;
-import com.system.management.domain.request.UserRequest;
+import com.system.management.domain.request.RegisterRequest;
 import com.system.management.domain.response.UserResponse;
 import com.system.management.repository.CropRepository;
-import com.system.management.repository.FarmerDisinfectionRepository;
+import com.system.management.repository.FarmerPlanRepository;
 import com.system.management.repository.LandRepository;
 import com.system.management.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,30 +28,26 @@ public class UserService implements IUserService{
 
     CropRepository cropRepository;
 
-    FarmerDisinfectionRepository farmerDisinfectionRepository;
+    FarmerPlanRepository farmerPlanRepository;
 
-    public int saveUser(UserRequest userRequest) {
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public int saveUser(RegisterRequest registerRequest) {
         try {
-            User user = new User();
-            user.setUserName(userRequest.getUserName());
-            user.setUserEmail(userRequest.getUserEmail());
-            user.setUserGsm(userRequest.getUserGsm());
-            user.setUserPass(userRequest.getUserPass());
-            user.setCropList(userRequest.getCropList());
-            user.setLandList(userRequest.getLandList());
-            User savedUser = userRepository.save(user);
+            User user = userRepository.findByUserName(registerRequest.getUserName());
+            if(user!=null) {
+                return -1;
+            } else {
+                user = new User();
+                user.setUserName(registerRequest.getUserName());
+                user.setUserEmail(registerRequest.getUserEmail());
+                user.setUserGsm(registerRequest.getUserGsm());
+                user.setUserPass(bCryptPasswordEncoder.encode(registerRequest.getUserPass()));
+                User savedUser = userRepository.save(user);
 
-            for (Land land:userRequest.getLandList()) {
-                land.setUser(savedUser);
-                landRepository.save(land);
+                log.info("New User Saved. UserName: {}",savedUser.getUserName());
+                return savedUser.getUserId();
             }
-
-            for (Crop crop:userRequest.getCropList()) {
-                crop.setUser(savedUser);
-                cropRepository.save(crop);
-            }
-            log.info("New User Saved. UserName: {}",savedUser.getUserName());
-            return savedUser.getUserId();
         } catch (Exception e) {
             log.error("Exception occured while saving new user.",e);
             return 0;
@@ -80,25 +77,13 @@ public class UserService implements IUserService{
     }
 
     @Transactional
-    public boolean updateUser(Integer userId,UserRequest userRequest) {
+    public boolean updateUser(Integer userId, RegisterRequest registerRequest) {
         try {
             User user = userRepository.findByUserId(userId);
-            user.setUserGsm(userRequest.getUserGsm());
-            user.setUserEmail(userRequest.getUserEmail());
-            user.setUserName(userRequest.getUserName());
-            user.setUserPass(userRequest.getUserPass());
-            landRepository.deleteByUserUserId(userId);
-            cropRepository.deleteByUserUserId(userId);
-
-            for (Land land:userRequest.getLandList()) {
-                land.setUser(user);
-                landRepository.save(land);
-            }
-
-            for (Crop crop:userRequest.getCropList()) {
-                crop.setUser(user);
-                cropRepository.save(crop);
-            }
+            user.setUserGsm(registerRequest.getUserGsm());
+            user.setUserEmail(registerRequest.getUserEmail());
+            user.setUserName(registerRequest.getUserName());
+            user.setUserPass(registerRequest.getUserPass());
 
             userRepository.save(user);
             return true;
@@ -111,8 +96,10 @@ public class UserService implements IUserService{
     @Transactional
     @Override
     public void deleteUserById(Integer userId) {
-        farmerDisinfectionRepository.deleteByUserUserId(userId);
+        farmerPlanRepository.deleteByUserUserId(userId);
         userRepository.deleteByUserId(userId);
+        cropRepository.deleteByUserUserId(userId);
+        landRepository.deleteByUserUserId(userId);
     }
 
 }

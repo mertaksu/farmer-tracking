@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,13 +19,13 @@ public class LandController {
     private final ILandService landService;
 
     @PostMapping(path = "/land",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LandResponse> saveNewLand(@RequestBody LandRequest landRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(landService.addLand(landRequest));
+    public ResponseEntity<LandResponse> saveNewLand(HttpServletRequest request,@RequestBody LandRequest landRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(landService.addLand(landRequest,Integer.parseInt((String) request.getAttribute("userId"))));
     }
 
-    @GetMapping(path = "/land/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Land>> getUsersLand(@PathVariable Integer userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(landService.getLandsOfUser(userId));
+    @GetMapping(path = "/land", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Land>> getUsersLand(HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(landService.getLandsOfUser(Integer.parseInt(((String)request.getAttribute("userId")))));
     }
 
     @DeleteMapping(path = "/land/{landId}")

@@ -1,4 +1,4 @@
-package com.system.management.domain.response;
+package com.system.management.domain.request;
 
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.Land;
@@ -12,14 +12,14 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class FarmerDisinfectionResponse {
-    private String pharmacyType;
+public class FarmerPlanRequest {
 
-    private Date pharmacyDate;
+    private String planType;
 
-    private Crop crop;
+    private String[] planDate;
 
-    private Land land;
+    private String cropId;
 
-    private Boolean status;
+    private String landId;
+
 }

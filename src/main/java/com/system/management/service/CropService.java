@@ -5,7 +5,7 @@ import com.system.management.domain.entity.User;
 import com.system.management.domain.request.CropRequest;
 import com.system.management.domain.response.CropResponse;
 import com.system.management.repository.CropRepository;
-import com.system.management.repository.FarmerDisinfectionRepository;
+import com.system.management.repository.FarmerPlanRepository;
 import com.system.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,12 @@ public class CropService implements ICropService {
 
     private final UserRepository userRepository;
 
-    private final FarmerDisinfectionRepository farmerDisinfectionRepository;
+    private final FarmerPlanRepository farmerPlanRepository;
 
     @Override
-    public CropResponse addCrop(CropRequest cropRequest) {
+    public CropResponse addCrop(CropRequest cropRequest,int userId) {
         Crop crop = new Crop();
-        User user = userRepository.findByUserId(cropRequest.getUserId());
+        User user = userRepository.findByUserId(userId);
         crop.setUser(user);
         crop.setCropName(cropRequest.getCropName());
 
@@ -43,8 +43,8 @@ public class CropService implements ICropService {
     @Override
     public boolean deleteCrop(Integer cropId) {
         try {
+            farmerPlanRepository.deleteByCropId(cropId);
             cropRepository.deleteById(cropId);
-            farmerDisinfectionRepository.deleteByCropId(cropId);
             return true;
         } catch (Exception e) {
             return false;

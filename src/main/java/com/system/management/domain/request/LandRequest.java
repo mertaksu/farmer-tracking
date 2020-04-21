@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class LandRequest {
     private String landName;
-    private Integer userId;
+    private Double latitude;
+    private Double longitude;
 }

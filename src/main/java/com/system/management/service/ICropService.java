@@ -7,7 +7,7 @@ import com.system.management.domain.response.CropResponse;
 import java.util.List;
 
 public interface ICropService {
-    CropResponse addCrop(CropRequest cropRequest);
+    CropResponse addCrop(CropRequest cropRequest,int userId);
     boolean deleteCrop(Integer cropId);
     List<Crop> getCropsOfUser(Integer userId);
     boolean updateCropName(Integer cropId,String cropName);

@@ -11,17 +11,17 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "FARMER_DISINFECTION_TRANSACTION")
-public class FarmerDisinfectionTransaction {
+@Table(name = "FARMER_PLANNED_TRANSACTION")
+public class FarmerPlanTransaction {
     @Id
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "PHARMACY_TYPE")
-    private String pharmacyType;
+    @Column(name = "PLAN_TYPE")
+    private String planType;
 
-    @Column(name = "PHARMACY_DATE")
-    private Date pharmacyDate;
+    @Column(name = "PLAN_DATE")
+    private Date planDate;
 
     @ManyToOne
     @JoinColumn(name = "crop_id")

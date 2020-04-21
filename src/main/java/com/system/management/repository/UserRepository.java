@@ -10,5 +10,6 @@ import java.util.List;
 public interface UserRepository extends CrudRepository<User,Integer> {
     User findByUserId(Integer userId);
     List<User> findByUserNameAndUserPass(String userName, String pass);
+    User findByUserName(String userName);
     void deleteByUserId(Integer userId);
 }

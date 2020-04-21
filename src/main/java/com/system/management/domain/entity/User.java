@@ -28,11 +28,4 @@ public class User {
 
     @Column(name = "USER_PASS")
     private String userPass;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Land> landList;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private List<Crop> cropList;
-
 }
