@@ -8,12 +8,14 @@ import com.system.management.repository.FarmerPlanRepository;
 import com.system.management.repository.LandRepository;
 import com.system.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class LandService implements ILandService {
@@ -26,18 +28,23 @@ public class LandService implements ILandService {
 
     @Override
     public LandResponse addLand(LandRequest landRequest,int userId) {
-        Land land = new Land();
-        User user = userRepository.findByUserId(userId);
-        land.setUser(user);
-        land.setLandName(landRequest.getLandName());
-        land.setLatitude(landRequest.getLatitude());
-        land.setLongitude(landRequest.getLongitude());
-
-        Land savedLand = landRepository.save(land);
         LandResponse landResponse = new LandResponse();
-        landResponse.setId(savedLand.getId());
-        landResponse.setLandName(savedLand.getLandName());
-        landResponse.setUserId(savedLand.getUser().getUserId());
+        try {
+            Land land = new Land();
+            User user = userRepository.findByUserId(userId);
+            land.setUser(user);
+            land.setLandName(landRequest.getLandName());
+            land.setLatitude(landRequest.getLatitude());
+            land.setLongitude(landRequest.getLongitude());
+
+            Land savedLand = landRepository.save(land);
+
+            landResponse.setId(savedLand.getId());
+            landResponse.setLandName(savedLand.getLandName());
+            landResponse.setUserId(savedLand.getUser().getUserId());
+        } catch (Exception e) {
+            log.error("Exception ",e);
+        }
         return landResponse;
     }
 
@@ -49,6 +56,7 @@ public class LandService implements ILandService {
             landRepository.deleteById(landId);
             return true;
         } catch (Exception e) {
+            log.error("Exception ",e);
             return false;
         }
     }
@@ -70,6 +78,7 @@ public class LandService implements ILandService {
                 return false;
             }
         } catch (Exception e) {
+            log.error("Exception ",e);
             return false;
         }
     }

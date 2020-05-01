@@ -8,12 +8,14 @@ import com.system.management.repository.CropRepository;
 import com.system.management.repository.FarmerPlanRepository;
 import com.system.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CropService implements ICropService {
@@ -47,6 +49,7 @@ public class CropService implements ICropService {
             cropRepository.deleteById(cropId);
             return true;
         } catch (Exception e) {
+            log.error("Exception ",e);
             return false;
         }
     }
@@ -68,6 +71,7 @@ public class CropService implements ICropService {
                 return false;
             }
         } catch (Exception e) {
+            log.error("Exception ",e);
             return false;
         }
     }

@@ -25,11 +25,8 @@ public class TokenAuthentication implements AuthenticationProvider{
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 	  String userName =	authentication.getName();
 	  String password = authentication.getCredentials().toString();
-	  List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>();
+	  List<GrantedAuthority> authList = new ArrayList<>();
 	  
-	  //TODO
-	  //Encrypt pass to brcypt hash
-	  UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new	UsernamePasswordAuthenticationToken(userName,password,authList);
 	  List<User> user = userRepository.findByUserNameAndUserPass(userName, password);
 	  if(user!=null && user.size()>0) {
 		return new UsernamePasswordAuthenticationToken(userName,password,authList);
