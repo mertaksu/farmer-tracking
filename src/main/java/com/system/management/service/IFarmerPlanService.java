@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface IFarmerPlanService {
     Boolean saveNewFarmerPlan(FarmerPlanRequest farmerPlanRequest,int userId);
-    List<FarmerPlanTransaction> getFarmerPlanTransactionsByUserId(Integer userId);
+    List<FarmerPlanTransaction> getFarmerPlanTransactionsByUserIdAfterCurrDate(Integer userId) throws Exception;
+    List<FarmerPlanTransaction> getFarmerPlanTransactionsByUserIdBeforeCurrDate(Integer userId) throws Exception;
     void deletePlanTransactionById(Integer id);
 }

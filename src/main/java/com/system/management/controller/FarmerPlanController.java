@@ -37,22 +37,37 @@ public class FarmerPlanController {
     @GetMapping(path = "/plan", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<FarmerPlanResponse>> getFarmerPlans(HttpServletRequest request) {
         try {
-            List<FarmerPlanResponse> farmerPlanResponseList = new ArrayList<>();
-            List<FarmerPlanTransaction> responseList = farmerPlanService.getFarmerPlanTransactionsByUserId(Integer.valueOf((String) request.getAttribute("userId")));
-            for (FarmerPlanTransaction farmerPlanTransaction:responseList) {
-                FarmerPlanResponse farmerPlanResponse = new FarmerPlanResponse();
-                farmerPlanResponse.setFarmerPlanId(farmerPlanTransaction.getId());
-                farmerPlanResponse.setCropName(farmerPlanTransaction.getCrop().getCropName());
-                farmerPlanResponse.setLandName(farmerPlanTransaction.getLand().getLandName());
-                farmerPlanResponse.setPlanDate(new SimpleDateFormat("yyyy-MM-dd").format(farmerPlanTransaction.getPlanDate()));
-                farmerPlanResponse.setPlanType(farmerPlanTransaction.getPlanType());
-                farmerPlanResponseList.add(farmerPlanResponse);
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(farmerPlanResponseList);
+            List<FarmerPlanTransaction> responseList = farmerPlanService.getFarmerPlanTransactionsByUserIdAfterCurrDate(Integer.valueOf((String) request.getAttribute("userId")));
+            return ResponseEntity.status(HttpStatus.OK).body(getFarmerPlanList(responseList));
         } catch (Exception e) {
             log.error("Exception ",e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping(path = "/prevPlan", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<FarmerPlanResponse>> getPrevFarmerPlans(HttpServletRequest request) {
+        try {
+            List<FarmerPlanTransaction> responseList = farmerPlanService.getFarmerPlanTransactionsByUserIdBeforeCurrDate(Integer.valueOf((String) request.getAttribute("userId")));
+            return ResponseEntity.status(HttpStatus.OK).body(getFarmerPlanList(responseList));
+        } catch (Exception e) {
+            log.error("Exception ",e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    private List<FarmerPlanResponse> getFarmerPlanList(List<FarmerPlanTransaction> responseList ) {
+        List<FarmerPlanResponse> farmerPlanResponseList = new ArrayList<>();
+        for (FarmerPlanTransaction farmerPlanTransaction:responseList) {
+            FarmerPlanResponse farmerPlanResponse = new FarmerPlanResponse();
+            farmerPlanResponse.setFarmerPlanId(farmerPlanTransaction.getId());
+            farmerPlanResponse.setCropName(farmerPlanTransaction.getCrop().getCropName());
+            farmerPlanResponse.setLandName(farmerPlanTransaction.getLand().getLandName());
+            farmerPlanResponse.setPlanDate(new SimpleDateFormat("yyyy-MM-dd").format(farmerPlanTransaction.getPlanDate()));
+            farmerPlanResponse.setPlanType(farmerPlanTransaction.getPlanType());
+            farmerPlanResponseList.add(farmerPlanResponse);
+        }
+        return farmerPlanResponseList;
     }
 
     @DeleteMapping(path = "/plan/{planId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

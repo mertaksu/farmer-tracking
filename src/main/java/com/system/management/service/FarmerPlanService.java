@@ -1,5 +1,6 @@
 package com.system.management.service;
 
+import com.sun.tools.classfile.ConstantPool;
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.FarmerPlanTransaction;
 import com.system.management.domain.entity.Land;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,6 +32,8 @@ public class FarmerPlanService implements IFarmerPlanService {
     LandRepository landRepository;
 
     CropRepository cropRepository;
+
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public Boolean saveNewFarmerPlan(FarmerPlanRequest farmerPlanRequest,int userId) {
@@ -60,8 +65,13 @@ public class FarmerPlanService implements IFarmerPlanService {
     }
 
     @Override
-    public List<FarmerPlanTransaction> getFarmerPlanTransactionsByUserId(Integer userId) {
-        return farmerPlanRepository.findByUserUserIdOrderByPlanDateAsc(userId);
+    public List<FarmerPlanTransaction> getFarmerPlanTransactionsByUserIdAfterCurrDate(Integer userId) throws Exception {
+        return farmerPlanRepository.findByUserUserIdAndPlanDateGreaterThanEqualOrderByPlanDateAsc(userId, format.parse(format.format(new Date())));
+    }
+
+    @Override
+    public List<FarmerPlanTransaction> getFarmerPlanTransactionsByUserIdBeforeCurrDate(Integer userId) throws Exception {
+        return farmerPlanRepository.findByUserUserIdAndPlanDateLessThan(userId,format.parse(format.format(new Date())));
     }
 
     @Transactional
