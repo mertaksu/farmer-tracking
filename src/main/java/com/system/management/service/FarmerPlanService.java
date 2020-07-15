@@ -1,6 +1,5 @@
 package com.system.management.service;
 
-import com.sun.tools.classfile.ConstantPool;
 import com.system.management.domain.entity.Crop;
 import com.system.management.domain.entity.FarmerPlanTransaction;
 import com.system.management.domain.entity.Land;
@@ -15,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
