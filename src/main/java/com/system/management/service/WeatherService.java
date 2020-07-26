@@ -13,7 +13,7 @@ import java.util.*;
 @Service
 public class WeatherService implements IWeatherService {
 
-    private static final SimpleDateFormat dayPattern = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat dayPattern = new SimpleDateFormat("EEE, d MMM", new Locale("TR"));
     private static final SimpleDateFormat hourPattern = new SimpleDateFormat("HH:mm");
 
     private static final String apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat={latitude}&lon={longitude}&units=metric&lang=tr&appid=5c004551d520aa01b11e7637439e9217";
@@ -22,7 +22,7 @@ public class WeatherService implements IWeatherService {
     public WeatherResponse getWeather(Double latitude, Double longitude) {
         WeatherResponse weatherResponse = new WeatherResponse();
         try {
-            Map<Long,List<HourlyWeather>> hourlyWetherPerDay = new TreeMap<>();
+            Map<String,List<HourlyWeather>> hourlyWetherPerDay = new TreeMap<>();
             List<DailyWeather> dailyWeatherList = new ArrayList<>();
             Map<String, Double> params = new HashMap<>();
             params.put("latitude", latitude);
@@ -34,12 +34,12 @@ public class WeatherService implements IWeatherService {
                     openWeatherResponse.getHourly().forEach(hourly -> {
                         Date date = new Date(hourly.getDt()*1000);
                         String day = dayPattern.format(date);
-                        if(!hourlyWetherPerDay.containsKey(Long.valueOf(day))) {
+                        if(!hourlyWetherPerDay.containsKey(day)) {
                             List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
                             hourlyWeatherList.add(hourlyWeather(hourly));
-                            hourlyWetherPerDay.put(Long.valueOf(day),hourlyWeatherList);
+                            hourlyWetherPerDay.put(day,hourlyWeatherList);
                         } else {
-                            hourlyWetherPerDay.get(Long.valueOf(day)).add(hourlyWeather(hourly));
+                            hourlyWetherPerDay.get(day).add(hourlyWeather(hourly));
                         }
                     });
                 }

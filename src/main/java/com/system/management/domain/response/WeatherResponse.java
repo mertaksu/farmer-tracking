@@ -9,6 +9,6 @@ import java.util.Map;
 @Getter
 @Setter
 public class WeatherResponse {
-    Map<Long,List<HourlyWeather>> hourlyWetherPerDay;
+    Map<String,List<HourlyWeather>> hourlyWetherPerDay;
     List<DailyWeather> dailyWeatherList;
 }
