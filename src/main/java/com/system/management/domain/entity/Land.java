@@ -17,8 +17,8 @@ public class Land {
     @Column(name = "land_id")
     private Integer id;
 
-    @Column(name = "LAND_NAME")
-    private String landName;
+    @Column(name = "TITLE")
+    private String title;
 
     @Column(name = "LATITUDE")
     private Double latitude;
@@ -26,10 +26,12 @@ public class Land {
     @Column(name = "LONGITUDE")
     private Double longitude;
 
+    @Column(name = "PLACE_NAME")
+    private String placeName;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Land(String name) {this.landName=name;}
 }

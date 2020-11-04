@@ -3,12 +3,11 @@ package com.system.management.domain.response;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
-public class WeatherResponse {
+public class LandCoordinate {
     private String title;
     private String placeName;
-    private List<DailyWeather> dailyWeatherList;
+    private Double latitude;
+    private Double longitude;
 }

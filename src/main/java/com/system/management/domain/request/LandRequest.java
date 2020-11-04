@@ -11,4 +11,5 @@ public class LandRequest {
     private String landName;
     private Double latitude;
     private Double longitude;
+    private String placeName;
 }

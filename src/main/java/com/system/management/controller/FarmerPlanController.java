@@ -62,7 +62,7 @@ public class FarmerPlanController {
             FarmerPlanResponse farmerPlanResponse = new FarmerPlanResponse();
             farmerPlanResponse.setFarmerPlanId(farmerPlanTransaction.getId());
             farmerPlanResponse.setCropName(farmerPlanTransaction.getCrop().getCropName());
-            farmerPlanResponse.setLandName(farmerPlanTransaction.getLand().getLandName());
+            farmerPlanResponse.setLandName(farmerPlanTransaction.getLand().getTitle());
             farmerPlanResponse.setPlanDate(new SimpleDateFormat("yyyy-MM-dd").format(farmerPlanTransaction.getPlanDate()));
             farmerPlanResponse.setPlanType(farmerPlanTransaction.getPlanType());
             farmerPlanResponseList.add(farmerPlanResponse);

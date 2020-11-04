@@ -1,80 +1,82 @@
 package com.system.management.service;
 
 import com.system.management.domain.response.*;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class WeatherService implements IWeatherService {
 
     private static final SimpleDateFormat dayPattern = new SimpleDateFormat("EEE, d MMM", new Locale("TR"));
-    private static final SimpleDateFormat hourPattern = new SimpleDateFormat("HH:mm");
 
-    private static final String apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat={latitude}&lon={longitude}&units=metric&lang=tr&appid=5c004551d520aa01b11e7637439e9217";
+    private static final String weatherApiWeatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat={latitude}&lon={longitude}&units=metric&lang=tr&appid=5c004551d520aa01b11e7637439e9217";
+
+    private final ILandService landService;
 
     @Override
-    public WeatherResponse getWeather(Double latitude, Double longitude) {
-        WeatherResponse weatherResponse = new WeatherResponse();
+    public List<WeatherResponse> getWeather(Integer userId) {
+        List<LandCoordinate> landCoordinateList = getLandCoordinateList(userId);
+        List<WeatherResponse> weatherResponseList = new ArrayList<>();
         try {
-            Map<String,List<HourlyWeather>> hourlyWetherPerDay = new TreeMap<>();
-            List<DailyWeather> dailyWeatherList = new ArrayList<>();
-            Map<String, Double> params = new HashMap<>();
-            params.put("latitude", latitude);
-            params.put("longitude",longitude);
-            RestTemplate restTemplate = new RestTemplate();
-            OpenWeatherResponse openWeatherResponse = restTemplate.getForObject(apiUrl, OpenWeatherResponse.class,params);
-            if(openWeatherResponse!=null) {
-                if(openWeatherResponse.getHourly()!=null) {
-                    openWeatherResponse.getHourly().forEach(hourly -> {
-                        Date date = new Date(hourly.getDt()*1000);
-                        String day = dayPattern.format(date);
-                        if(!hourlyWetherPerDay.containsKey(day)) {
-                            List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
-                            hourlyWeatherList.add(hourlyWeather(hourly));
-                            hourlyWetherPerDay.put(day,hourlyWeatherList);
-                        } else {
-                            hourlyWetherPerDay.get(day).add(hourlyWeather(hourly));
+            for (LandCoordinate landCoordinate:landCoordinateList) {
+                long startTime = System.currentTimeMillis();
+                WeatherResponse weatherResponse = new WeatherResponse();
+                CompletableFuture<Void> weatherResponseCompletableFuture = new CompletableFuture<>();
+                try {
+                    Map<String, Double> params = new HashMap<>();
+                    params.put("latitude", landCoordinate.getLatitude());
+                    params.put("longitude",landCoordinate.getLongitude());
+                    RestTemplate restTemplate = new RestTemplate();
+
+                    weatherResponseCompletableFuture = CompletableFuture.runAsync(() -> {
+                        List<DailyWeather> dailyWeatherList = new ArrayList<>();
+                        long start = System.currentTimeMillis();
+                        OpenWeatherResponse openWeatherResponse = restTemplate.getForObject(weatherApiWeatherUrl, OpenWeatherResponse.class,params);
+                        log.info("Api called for weather with delta: {}",System.currentTimeMillis()-start);
+                        if(openWeatherResponse!=null) {
+
+                            if(openWeatherResponse.getDaily()!=null) {
+                                openWeatherResponse.getDaily().forEach(daily -> {
+                                    DailyWeather dailyWeather = new DailyWeather();
+                                    Date date = new Date(daily.getDt()*1000);
+                                    String day = dayPattern.format(date);
+                                    dailyWeather.setDay(day);
+                                    dailyWeather.setCentigrade((int)daily.getTemp().getDay()+"°C");
+                                    dailyWeather.setDesc(daily.getWeather().get(0).getDescription());
+                                    dailyWeather.setIcon(daily.getWeather().get(0).getIcon());
+                                    dailyWeatherList.add(dailyWeather);
+                                });
+                            }
                         }
+                        weatherResponse.setDailyWeatherList(dailyWeatherList);
+                        weatherResponse.setPlaceName(landCoordinate.getPlaceName());
+                        weatherResponse.setTitle(landCoordinate.getTitle());
                     });
+
+                } catch (Exception e) {
+                    log.error("Exception occured while getting weather response ",e);
                 }
 
-                if(openWeatherResponse.getDaily()!=null) {
-                    openWeatherResponse.getDaily().forEach(daily -> {
-                        DailyWeather dailyWeather = new DailyWeather();
-                        Date date = new Date(daily.getDt()*1000);
-                        String day = dayPattern.format(date);
-                        dailyWeather.setDay(day);
-                        dailyWeather.setCentigrade(String.valueOf((int)daily.getTemp().getDay()));
-                        dailyWeather.setDesc(daily.getWeather().get(0).getDescription());
-                        dailyWeather.setIcon(daily.getWeather().get(0).getIcon());
-                        dailyWeatherList.add(dailyWeather);
-                    });
-                }
+                weatherResponseCompletableFuture.join();
+                log.info("Total weather service delta:{}",System.currentTimeMillis()-startTime);
+                weatherResponseList.add(weatherResponse);
             }
-            weatherResponse.setDailyWeatherList(dailyWeatherList);
-            weatherResponse.setHourlyWetherPerDay(hourlyWetherPerDay);
+
         } catch (Exception e) {
-            log.error("Exception occured while getting weather response ",e);
+            log.error("Exception occured.",e);
         }
-        return weatherResponse;
+        return weatherResponseList;
     }
 
-    private HourlyWeather hourlyWeather(Hourly hourly) {
-        HourlyWeather hourlyWeather = new HourlyWeather();
-        try {
-            hourlyWeather.setHour(hourPattern.format(new Date(hourly.getDt()*1000)));
-            hourlyWeather.setCentigrade(String.valueOf((int)hourly.getTemp()));
-            hourlyWeather.setIcon(hourly.getWeather().get(0).getIcon());
-            hourlyWeather.setDesc(hourly.getWeather().get(0).getDescription());
-        } catch (Exception e) {
-            log.error("Error while setting");
-        }
-        return hourlyWeather;
+    private List<LandCoordinate> getLandCoordinateList(Integer userId) {
+        return landService.getLandsCoordOfUser(userId);
     }
 }

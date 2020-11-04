@@ -2,6 +2,8 @@ package com.system.management.service;
 
 import com.system.management.domain.response.WeatherResponse;
 
+import java.util.List;
+
 public interface IWeatherService {
-    WeatherResponse getWeather(Double latitude, Double longitude);
+    List<WeatherResponse> getWeather(Integer userId);
 }
