@@ -11,7 +11,6 @@ curl -X POST \
   http://192.168.1.38:8080/user \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
-  -H 'postman-token: 2bf9cb4b-4663-d8b0-fcde-bfb9c97bfc0c' \
   -d '{
 "userName":"example",
 "userEmail":"example@outlook.com",
@@ -28,7 +27,6 @@ curl -X POST \
   http://64.227.113.38:8080/login \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
-  -H 'postman-token: ad95f4af-8644-1aaa-c395-4dbc53565b47' \
   -d '{
 "username":"mertaksu5",
 "password":"1234Aa"
