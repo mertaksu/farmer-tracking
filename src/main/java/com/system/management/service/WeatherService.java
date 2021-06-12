@@ -17,7 +17,7 @@ public class WeatherService implements IWeatherService {
 
     private static final SimpleDateFormat dayPattern = new SimpleDateFormat("EEE, d MMM", new Locale("TR"));
 
-    private static final String weatherApiWeatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat={latitude}&lon={longitude}&units=metric&lang=tr&appid=5c004551d520aa01b11e7637439e9217";
+    private static final String weatherApiWeatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat={latitude}&lon={longitude}&units=metric&lang=tr&appid=***";
 
     private final ILandService landService;
 
